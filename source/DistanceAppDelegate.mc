@@ -2,6 +2,7 @@ import Toybox.WatchUi;
 import Toybox.Position;
 import Toybox.Math;
 import Toybox.Lang;
+import Toybox.Timer;
 
 class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
@@ -14,9 +15,17 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
     private var _lat1;
     private var _lon1;
+    private var _timer1;
 
     private var _lat2;
     private var _lon2;
+    private var _timer2;
+
+    private var totalDistance;
+    private var speed = 0;
+
+    private var myTimer;
+    private var timer = 0;
 
 
     function initialize(view) {
@@ -29,6 +38,8 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
             Position.LOCATION_CONTINUOUS,
             method(:onPosition)
         );
+        myTimer = new Timer.Timer();
+        myTimer.start(method(:incrementTimer), 1000, true);
     }
 
 
@@ -64,16 +75,17 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         // FIRST POINT
 
-        if (!_point1Set) {
+        if (_point1Set) {
 
             _lat1 = latitude;
             _lon1 = longitude;
+            _timer1 = timer;
 
-            _point1Set = true;
+            _point1Set = false;
 
             _view.updateDisplay(
                 "Saved",
-                ""
+                "",0
             );
 
             return;
@@ -82,12 +94,13 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         // SECOND POINT
 
-        if (!_point2Set) {
+        if (_point2Set) {
 
             _lat2 = latitude;
             _lon2 = longitude;
+            _timer2 = timer;
 
-            _point2Set = true;
+            _point2Set = false;
 
             calculateDistance();
 
@@ -129,46 +142,38 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         var roundedDistance = (distance + 0.5).toNumber();
 
+        totalDistance = roundedDistance;
+
         if (roundedDistance >= 1000) {
 
             var kilometres = distance / 1000.0;
-
+            calcSpeed(totalDistance);
             _view.updateDisplay(
                 "Saved",
-                kilometres.toString() + " km"
+                kilometres.toString() + " km",speed
             );
 
         } else {
-
+            calcSpeed(totalDistance);
             _view.updateDisplay(
                 "Saved",
-                roundedDistance.toString() + " m"
+                roundedDistance.toString() + " m",speed
             );
         }
     }
+    function calcSpeed(dist as Number) as Void {
+        var elapsedTIme = _timer2 - _timer1;
 
+        speed = dist / elapsedTIme;
+
+    }
 
     function onPreviousPage() as Boolean {
 
         // If both points have already been saved,
         // start a new measurement.
 
-        if (_point2Set) {
-
-            _point1Set = false;
-            _point2Set = false;
-
-            _lat1 = null;
-            _lon1 = null;
-
-            _lat2 = null;
-            _lon2 = null;
-
-            _view.updateDisplay(
-                "Press UP",
-                ""
-            );
-        }
+        _point1Set = true;
 
 
         // Wait for a good GPS fix
@@ -177,7 +182,26 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         _view.updateDisplay(
             "Waiting for GPS",
-            ""
+            "", 0
+        );
+
+        return true;
+    }
+
+    function onNextPage() as Boolean {
+        // If both points have already been saved,
+        // start a new measurement.
+
+        _point2Set = true;
+
+
+        // Wait for a good GPS fix
+
+        _waitingForPoint = true;
+
+        _view.updateDisplay(
+            "Waiting for GPS",
+            "",0
         );
 
         return true;
@@ -193,5 +217,9 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
         // Allow the normal Back action to exit
 
         return false;
+    }
+
+    function incrementTimer() as Void{
+        timer++;
     }
 }
