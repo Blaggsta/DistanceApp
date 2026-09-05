@@ -14,6 +14,12 @@ class DistanceAppView extends WatchUi.View {
 
 
     function onUpdate(dc as Dc) as Void {
+        var width = dc.getWidth();
+        var height = dc.getHeight();
+        var titleY = height * 0.19;
+        var statusY = height * 0.42;
+        var distanceY = height * 0.64;
+        var speedY = height * 0.83;
 
         dc.setColor(
             Graphics.COLOR_WHITE,
@@ -22,11 +28,10 @@ class DistanceAppView extends WatchUi.View {
 
         dc.clear();
 
-        var width = dc.getWidth();
 
         dc.drawText(
             width / 2,
-            35,
+            titleY,
             Graphics.FONT_MEDIUM,
             "DistanceApp",
             Graphics.TEXT_JUSTIFY_CENTER
@@ -34,7 +39,7 @@ class DistanceAppView extends WatchUi.View {
 
         dc.drawText(
             width / 2,
-            75,
+            statusY,
             Graphics.FONT_MEDIUM,
             _status,
             Graphics.TEXT_JUSTIFY_CENTER
@@ -44,7 +49,7 @@ class DistanceAppView extends WatchUi.View {
 
             dc.drawText(
                 width / 2,
-                115,
+                distanceY,
                 Graphics.FONT_LARGE,
                 _distance,
                 Graphics.TEXT_JUSTIFY_CENTER
@@ -53,7 +58,7 @@ class DistanceAppView extends WatchUi.View {
 
         dc.drawText(
             width / 2,
-            150,
+            speedY,
             Graphics.FONT_MEDIUM,
             _speed,
             Graphics.TEXT_JUSTIFY_CENTER
