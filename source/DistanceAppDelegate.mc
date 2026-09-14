@@ -13,11 +13,11 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
     private var _point1Set = false;
     private var _point2Set = false;
 
-    private var _lat1;
+    private var _lat1 = null;
     private var _lon1;
     private var _timer1;
 
-    private var _lat2;
+    private var _lat2 = null;
     private var _lon2;
     private var _timer2;
 
@@ -88,7 +88,6 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
                 "",0
             );
 
-            return;
         }
 
 
@@ -102,9 +101,15 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
             _point2Set = false;
 
+            _view.updateDisplay(
+                "Saved",
+                "",0
+            );
+            
+        }
+        
+        if (_lat1 != null && _lat2 != null){
             calculateDistance();
-
-            return;
         }
     }
 
@@ -144,10 +149,17 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         totalDistance = roundedDistance;
 
+        
+
         if (roundedDistance >= 1000) {
 
             var kilometres = distance / 1000.0;
             calcSpeed(totalDistance);
+            if (speed < 0){
+                speed = "loc2 -> loc1";
+            }else{
+                speed = "loc1 -> loc2";
+            }
             _view.updateDisplay(
                 "Saved",
                 kilometres.toString() + " km",speed
@@ -155,11 +167,18 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         } else {
             calcSpeed(totalDistance);
+            if (speed < 0){
+                speed = "loc2 -> loc1";
+            }else{
+                speed = "loc1 -> loc2";
+            }
             _view.updateDisplay(
                 "Saved",
                 roundedDistance.toString() + " m",speed
             );
         }
+
+        
     }
     function calcSpeed(dist as Number) as Void {
         var elapsedTIme = _timer2 - _timer1;

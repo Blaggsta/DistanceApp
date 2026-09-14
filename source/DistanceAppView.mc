@@ -5,7 +5,7 @@ class DistanceAppView extends WatchUi.View {
 
     private var _status = "Press UP";
     private var _distance = "";
-    private var _speed = 0;
+    private var _speed = "";
 
 
     function initialize() {
@@ -58,9 +58,24 @@ class DistanceAppView extends WatchUi.View {
 
         dc.drawText(
             width / 2,
-            speedY,
+            speedY + 7,
             Graphics.FONT_MEDIUM,
             _speed,
+            Graphics.TEXT_JUSTIFY_CENTER
+        );
+
+        dc.drawText(
+            dc.getWidth() * 0.10,
+            dc.getHeight() * 0.55,
+            Graphics.FONT_SMALL,
+            "Loc 1",
+            Graphics.TEXT_JUSTIFY_CENTER
+        );
+        dc.drawText(
+            dc.getWidth() * 0.2,
+            dc.getHeight() * 0.77,
+            Graphics.FONT_SMALL,
+            "Loc 2",
             Graphics.TEXT_JUSTIFY_CENTER
         );
     }
@@ -71,13 +86,23 @@ class DistanceAppView extends WatchUi.View {
         _status = status;
         _distance = distance;
         _speed = speed;
-        
+        /*
         if (speed > 0){
             var x = speed * 60 * 60;
             speed = x /1600;
             _speed = speed + " mph";
-        }
+        }*/
+        //_speed = "";
         WatchUi.requestUpdate();
+    }
+
+    function updateDistanceDirection(direction){
+        if (direction){
+            _speed = "loc1 -> loc2";
+        }else{
+            _speed = "loc2 -> loc1";
+        }
+
     }
 
 }
