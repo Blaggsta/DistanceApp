@@ -8,24 +8,20 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
     private var _view;
 
-    private var _waitingForPoint = false;
+
 
     private var _point1Set = false;
     private var _point2Set = false;
 
     private var _lat1 = null;
     private var _lon1;
-    private var _timer1;
 
     private var _lat2 = null;
     private var _lon2;
-    private var _timer2;
 
     private var totalDistance;
-    private var speed = 0;
 
-    private var myTimer;
-    private var timer = 0;
+
 
     private var currentLat = 0.0;
     private var currentLong = 0.0;
@@ -62,17 +58,13 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
         }
 
         // Don't save anything until UP is pressed
-/*
-        if (!_waitingForPoint) {
-            return;
-        }
-*/
+
         var coordinates = info.position.toDegrees();
 
         var latitude = coordinates[0];
         var longitude = coordinates[1];
 
-        _waitingForPoint = false;
+
 
         currentLat = latitude;
         currentLong = longitude;
@@ -83,7 +75,6 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
             _lat1 = latitude;
             _lon1 = longitude;
-            _timer1 = timer;
 
             _point1Set = false;
 
@@ -101,7 +92,6 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
             _lat2 = latitude;
             _lon2 = longitude;
-            _timer2 = timer;
 
             _point2Set = false;
 
@@ -181,7 +171,7 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         // Wait for a good GPS fix
 
-        _waitingForPoint = true;
+
 
         _view.updateDisplay(
             "Waiting for GPS",
@@ -200,7 +190,7 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         // Wait for a good GPS fix
 
-        _waitingForPoint = true;
+
 
         _view.updateDisplay(
             "Waiting for GPS",
