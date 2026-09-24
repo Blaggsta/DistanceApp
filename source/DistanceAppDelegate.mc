@@ -27,6 +27,9 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
     private var myTimer;
     private var timer = 0;
 
+    private var currentLat = 0.0;
+    private var currentLong = 0.0;
+
 
     function initialize(view) {
 
@@ -38,8 +41,7 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
             Position.LOCATION_CONTINUOUS,
             method(:onPosition)
         );
-        myTimer = new Timer.Timer();
-        myTimer.start(method(:incrementTimer), 1000, true);
+        
     }
 
 
@@ -60,11 +62,11 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
         }
 
         // Don't save anything until UP is pressed
-
+/*
         if (!_waitingForPoint) {
             return;
         }
-
+*/
         var coordinates = info.position.toDegrees();
 
         var latitude = coordinates[0];
@@ -72,6 +74,8 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         _waitingForPoint = false;
 
+        currentLat = latitude;
+        currentLong = longitude;
 
         // FIRST POINT
 
@@ -85,7 +89,7 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
             _view.updateDisplay(
                 "Saved",
-                "",0
+                ""
             );
 
         }
@@ -103,14 +107,22 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
             _view.updateDisplay(
                 "Saved",
-                "",0
+                ""
             );
             
         }
         
         if (_lat1 != null && _lat2 != null){
             calculateDistance();
+
+            var oneTOme = calculateLocToMe(1);
+            var twoTome = calculateLocToMe(2);
+
+            
+            _view.updateLoc1ToMe(oneTOme);
+            _view.updateLoc2ToMe(twoTome);
         }
+        WatchUi.requestUpdate();
     }
 
 
@@ -149,43 +161,15 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         totalDistance = roundedDistance;
 
-        
+        var formatted = totalDistance.format("%.0f");
 
-        if (roundedDistance >= 1000) {
-
-            var kilometres = distance / 1000.0;
-            calcSpeed(totalDistance);
-            if (speed < 0){
-                speed = "loc2 -> loc1";
-            }else{
-                speed = "loc1 -> loc2";
-            }
-            _view.updateDisplay(
-                "Saved",
-                kilometres.toString() + " km",speed
+        _view.updateDisplay(
+                "Saved",formatted
             );
-
-        } else {
-            calcSpeed(totalDistance);
-            if (speed < 0){
-                speed = "loc2 -> loc1";
-            }else{
-                speed = "loc1 -> loc2";
-            }
-            _view.updateDisplay(
-                "Saved",
-                roundedDistance.toString() + " m",speed
-            );
-        }
 
         
     }
-    function calcSpeed(dist as Number) as Void {
-        var elapsedTIme = _timer2 - _timer1;
-
-        speed = dist / elapsedTIme;
-
-    }
+    
 
     function onPreviousPage() as Boolean {
 
@@ -201,7 +185,7 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         _view.updateDisplay(
             "Waiting for GPS",
-            "", 0
+            ""
         );
 
         return true;
@@ -220,7 +204,7 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
 
         _view.updateDisplay(
             "Waiting for GPS",
-            "",0
+            ""
         );
 
         return true;
@@ -238,7 +222,70 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
         return false;
     }
 
-    function incrementTimer() as Void{
-        timer++;
+    
+
+
+
+    function calculateLocToMe(loc) as Float {
+        var locX;
+        var locY;
+        if (loc == 1){
+            locX = _lat1;
+            locY = _lon1;
+        }else{
+            locX = _lat2;
+            locY = _lon2;
+        }
+
+
+
+        var lat1 = Math.toRadians(locX);
+        var lat2 = Math.toRadians(currentLat);
+
+        var lon1 = Math.toRadians(locY);
+        var lon2 = Math.toRadians(currentLong);
+
+        var dLat = lat2 - lat1;
+        var dLon = lon2 - lon1;
+
+
+        // Haversine formula
+
+        var a =
+            Math.pow(Math.sin(dLat / 2), 2) +
+            Math.cos(lat1) *
+            Math.cos(lat2) *
+            Math.pow(Math.sin(dLon / 2), 2);
+
+
+        var c = 2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
+
+
+        // Earth radius in metres
+
+        var distance = 6371000 * c;
+
+        var roundedDistance = (distance + 0.5).toNumber();
+
+        totalDistance = roundedDistance;
+
+        return distance;
+/*
+        if (roundedDistance >= 1000) {
+
+            var kilometres = distance / 1000.0;
+            return kilometres;
+
+        } else {
+            
+            return distance;
+        }
+*/
+        
     }
+
+
 }
