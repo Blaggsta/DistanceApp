@@ -77,7 +77,7 @@ class DistanceAppDelegate extends WatchUi.BehaviorDelegate {
         currentLat = latitude;
         currentLong = longitude;
 
-        // FIRST POINT
+        // FIRST POINT //test
 
         if (_point1Set) {
 
